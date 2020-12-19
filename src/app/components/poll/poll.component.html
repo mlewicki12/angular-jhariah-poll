@@ -1,0 +1,14 @@
+
+<div class="poll">
+  <div *ngFor="let song of pollOptions" class="song">
+    <button (click)="vote(song.id)">Vote</button>
+    <div class="song-info">
+      <p>{{song.value}}</p>
+      <p>{{song.score}}</p>
+    </div>
+  </div>
+  <button *ngIf="canAdd()" (click)="addState()" class="suggest">Suggest a song</button>
+  <div *ngIf="getState() === 'adding'" class="suggest add-option">
+    <input class="text-input" type="text" [(ngModel)]="songName" />
+  </div>
+</div>
