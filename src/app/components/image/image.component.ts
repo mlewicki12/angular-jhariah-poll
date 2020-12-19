@@ -1,7 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, retry } from 'rxjs/operators';
+import { TwitterService } from 'src/app/services/twitter/twitter.service';
 
 @Component({
   selector: 'app-image',
@@ -9,11 +7,12 @@ import { catchError, retry } from 'rxjs/operators';
   styleUrls: ['./image.component.css']
 })
 export class ImageComponent implements OnInit {
-  private endpointUrl = 'https://api.twitter.com/1.1/users/show.json';
+  url: string;
 
-  constructor(private http: HttpClient) { }
+  constructor(private twitter: TwitterService) { }
 
   ngOnInit(): void {
+    this.twitter.getProfileImage('1134984907').subscribe(val => this.url = val);
   }
 
 }

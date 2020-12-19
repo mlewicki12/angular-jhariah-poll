@@ -1,3 +1,7 @@
+
+import twitter from './twitter.json';
+
 export const environment = {
-  production: true
+  production: true,
+  twitterConfig: twitter
 };
