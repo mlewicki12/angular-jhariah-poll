@@ -1,36 +1,58 @@
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { Poll } from 'src/app/types/poll';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PollService {
-  private MOCK_POLL = {
-    id: 'no',
-    options: [
-      {value: 'I Fell In Love With a Ninja Master - The Wonder Years', score: 5, id: 1},
-      {value: 'Friendless Summer - Magazine Beach', score: 3, id: 2},
-      {value: 'America\'s Suitehearts - Fall Out Boy', score: 4, id: 3},
-      {value: 'Fight Milk! - Riley!', score: 8, id: 4}
-    ]
+  polls: any;
+  pollStore: AngularFirestoreCollection<Poll>;
+
+  constructor(private firestore: AngularFirestore) { 
+    this.pollStore = firestore.collection('polls');
+    this.polls = {};
   }
 
-  constructor() { }
-
   getPoll(id: string) {
-    return of(this.MOCK_POLL);
+    return this.pollStore.snapshotChanges().pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data();
+        const id = a.payload.doc.id;
+        return { id, data };
+      })),
+      map(val => val.filter(item => item.id === id),
+      tap(val => this.polls[id] = val))
+    );
   }
 
   addVote(id: string, option: number) {
-    this.MOCK_POLL.options.find(val => val.id === option).score += 1;
+    let options = this.polls[id].options.find(val => val.id === option).score += 1;
+    this.firestore.collection('polls').doc(id).update({options: options});
   }
 
   addOption(id: string, option: string) {
+    if(!this.polls[id]) {
+      this.polls[id] = {
+        options: []
+      };
+    }
+
     var newId = 1;
-    while(this.MOCK_POLL.options.find(val => val.id == newId)) {
+    let options = this.polls[id].options;
+
+    while(options.find(val => val.id == newId)) {
       newId += 1;
     }
 
-    this.MOCK_POLL.options.push({value: option, score: 0, id: newId});
+    options.push({value: option, score: 0, id: newId});
+    this.firestore.collection('polls').doc(id).update({options: options});
+  }
+
+  newPoll(id: string) {
+    this.firestore.collection('polls').doc(id).update({options: []});
   }
 }

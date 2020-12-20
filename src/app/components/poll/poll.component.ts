@@ -24,16 +24,15 @@ export class PollComponent implements OnInit {
   }
 
   constructor(private pollService: PollService) {
-    pollService.getPoll('no').subscribe(val => this.pollOptions = val.options);
+    pollService.getPoll('jhariah').subscribe(val => this.pollOptions = val.length > 0 ? val[0].data.options.sort((a, b) => b.score - a.score) : []);
     this.state = ['voting'];
   }
 
   ngOnInit(): void { 
-    this.pollOptions.sort((a, b) => b.score - a.score);
   }
 
   vote(id: number) {
-    this.pollService.addVote('no', id);
+    this.pollService.addVote('jhariah', id);
     this.pollOptions.sort((a, b) => b.score - a.score);
   }
 
@@ -50,7 +49,7 @@ export class PollComponent implements OnInit {
   }
 
   add() {
-    this.pollService.addOption('no', this.songName);
+    this.pollService.addOption('jhariah', this.songName);
     this.state.pop();
   }
 }

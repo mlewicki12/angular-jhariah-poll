@@ -3,10 +3,12 @@
 // The list of file replacements can be found in `angular.json`.
 
 import twitter from './twitter.json';
+import firestore from './firestore.json';
 
 export const environment = {
   production: false,
-  twitterConfig: twitter
+  twitterConfig: twitter,
+  firestoreConfig: firestore
 };
 
 /*
