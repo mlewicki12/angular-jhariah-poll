@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+
+import { map, tap, first } from 'rxjs/operators';
 
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Poll } from 'src/app/types/poll';
@@ -36,13 +36,16 @@ export class PollService {
 
   addOption(id: string, option: string) {
     if(!this.polls[id]) {
-      this.polls[id] = {
-        options: []
-      };
-    }
+      this.getPoll(id).pipe(first()).subscribe(val => {
+        this.polls[id] = val[0] || {};
+        this.addOptionPoll(id, option);
+      });
+    } else this.addOptionPoll(id, option);
+  }
 
+  private addOptionPoll(id: string, option: string) {
     var newId = 1;
-    let options = this.polls[id].options;
+    let options = this.polls[id].data.options || [];
 
     while(options.find(val => val.id == newId)) {
       newId += 1;
