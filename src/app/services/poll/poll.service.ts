@@ -24,13 +24,15 @@ export class PollService {
         const id = a.payload.doc.id;
         return { id, data };
       })),
-      map(val => val.filter(item => item.id === id),
-      tap(val => this.polls[id] = val))
+      map(val => val.filter(item => item.id === id)[0]),
+      tap(val => this.polls[id] = val)
     );
   }
 
   addVote(id: string, option: number) {
-    let options = this.polls[id].options.find(val => val.id === option).score += 1;
+    let options = this.polls[id].data.options;
+    options.find(val => val.id === option).score += 1;
+    
     this.firestore.collection('polls').doc(id).update({options: options});
   }
 

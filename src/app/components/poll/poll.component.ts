@@ -8,8 +8,9 @@ import { Option } from 'src/app/types/option';
   styleUrls: ['./poll.component.css']
 })
 export class PollComponent implements OnInit {
-  pollOptions: Option[];
+  pollOptions: any;
   state: ('voting' | 'voted' | 'adding')[];
+  added: boolean;
 
   songName: string;
 
@@ -24,8 +25,12 @@ export class PollComponent implements OnInit {
   }
 
   constructor(private pollService: PollService) {
-    pollService.getPoll('jhariah').subscribe(val => this.pollOptions = val.length > 0 ? val[0].data.options.sort((a, b) => b.score - a.score) : []);
+    pollService.getPoll('jhariah').subscribe(val => {
+      this.pollOptions = val.data.options || [];
+    });
+
     this.state = ['voting'];
+    this.added = false;
   }
 
   ngOnInit(): void { 
@@ -34,10 +39,11 @@ export class PollComponent implements OnInit {
   vote(id: number) {
     this.pollService.addVote('jhariah', id);
     this.pollOptions.sort((a, b) => b.score - a.score);
+    this.state.push('voted');
   }
 
   canAdd() {
-    return this.getState() !== 'adding' && this.pollOptions.length < this.limit;
+    return this.getState() !== 'adding' && this.pollOptions.length < this.limit && !this.added;
   }
 
   addState() {
@@ -50,6 +56,7 @@ export class PollComponent implements OnInit {
 
   add() {
     this.pollService.addOption('jhariah', this.songName);
+    this.added = true;
     this.state.pop();
   }
 }

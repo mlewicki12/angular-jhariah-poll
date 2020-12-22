@@ -1,7 +1,7 @@
 
 <div class="poll">
   <div *ngFor="let song of pollOptions" class="song">
-    <button (click)="vote(song.id)">Vote</button>
+    <button *ngIf="getState() === 'voting'" (click)="vote(song.id)">Vote</button>
     <div class="song-info">
       <p>{{song.value}}</p>
       <p>{{song.score}}</p>
