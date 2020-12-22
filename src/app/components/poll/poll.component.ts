@@ -27,6 +27,7 @@ export class PollComponent implements OnInit {
   constructor(private pollService: PollService) {
     pollService.getPoll('jhariah').subscribe(val => {
       this.pollOptions = val.data.options || [];
+      this.pollOptions.sort((a, b) => (b.score - a.score) || 0);
     });
 
     this.state = ['voting'];
